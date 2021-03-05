@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mandelbrot Set</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      (function () {
+        /**
+         * =======================================
+         * Mandelbrot display parameters
+         * =======================================
+         */
+        let zoom = 300;
+        let panX = 0.4499888;
+        let panY = -0.5;
+        const pixelSizeX = 5; // perfs
+        const pixelSizeY = 5; // perfs
+        const MandelbrotResolution = 500; // perfs
+        /**
+         * =======================================
+         */
+
+        // Create Canvas
+        const canvasEl = document.createElement("canvas");
+
+        // Set canvas size
+        const width =
+          window.innerWidth ||
+          document.documentElement.clientWidth ||
+          document.body.clientWidth;
+        const height =
+          window.innerHeight ||
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+        canvasEl.width = width;
+        canvasEl.height = height;
+
+        // Add canvas to document
+        document.body.appendChild(canvasEl);
+        const ctx = canvasEl.getContext("2d");
+
+        // Start drawing
+        requestAnimationFrame(draw);
+
+        /**
+         * Draw the Mandelbrot set
+         */
+        function draw() {
+          // Loop through each pixel
+          for (let x = 0; x < width; x += pixelSizeX) {
+            for (let y = 0; y < height; y += pixelSizeY) {
+              // Check if point is in Mandelbrot set
+              let isMandelbrot = checkMandelbrotSet(
+                x / zoom - panX,
+                y / zoom - panY
+              );
+
+              // Draw pixel
+              if (isMandelbrot == 0) {
+                ctx.fillStyle = "#000";
+                ctx.fillRect(x, y, pixelSizeX, pixelSizeY); // Black pixel
+              } else {
+                ctx.fillStyle = "hsl(" + isMandelbrot + ", 90%,  50%)";
+                ctx.fillRect(x, y, pixelSizeX, pixelSizeY); // Colored pixel
+              }
+            }
+          }
+          ctx.fillStyle = "#000";
+          ctx.strokeStyle = "#fff";
+          ctx.font = "15px Arial";
+          ctx.lineWidth = 0.2;
+          ctx.fillText(Math.round(zoom), 10, height - 30);
+          ctx.strokeText(Math.round(zoom), 10, height - 30);
+
+          // Zoom in
+          zoom *= 1.1;
+
+          requestAnimationFrame(draw);
+        }
+
+        /**
+         * Check if a complex is in Mandelbrot set
+         * @param {number} x
+         * @param {number} y
+         * @return {number} ratio based on the number of iterations
+         */
+        function checkMandelbrotSet(x, y) {
+          // C = {real, imaginary} - only here for comprehension
+          let real = x;
+          let imaginary = y;
+
+          // Iterate to check if C belongs To Mandelbrot set
+          for (let i = 0; i < MandelbrotResolution; i++) {
+            // Calculate the real and imaginary components of the result separately
+            let tempReal = real;
+
+            real = real * real - imaginary * imaginary + 0.3555;
+            imaginary = 2 * tempReal * imaginary + 0.3555;
+
+            // Check if the point escape the set
+            if (real * imaginary > 4) {
+              // Not in the Mandelbrot set
+              return 360 - (i / MandelbrotResolution) * 360;
+            }
+          }
+
+          // In the mandlebrot set
+          return 0;
+        }
+      })();
+    </script>
+  </body>
+</html>
