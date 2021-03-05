@@ -1,5 +1,7 @@
 # MANDELBROT
 
+## Javascript mandlebrot generator
+
 http://xahlee.info/cmaci/fractal/mandelbrot.html
 
 nb complexe : C {réel,imaginaire}
